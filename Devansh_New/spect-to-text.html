@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Speech to Text</title>
+</head>
+
+<body>
+  <div class="words" contenteditable>
+    <p id="p"></p>
+  </div>
+  <div class="container">
+    <h1>Speech to Text Notes Making</h1>
+    <div class="app">
+      <!-- <div class="input-single"> -->
+        <textarea id="notetextarea" placeholder="Create a new note by typing or using voice recognition." rows="20"
+          cols="100"></textarea>
+      <!-- </div> -->
+      <button id="start-record-btn" title="Start Recording">Start Recognition</button>
+      <button id="pause-record-btn" title="Pause Recording">Pause Recognition</button>
+      <button id="save-note-btn" title="Save Note">Save Note</button>
+      <p id="recording-instructions">Press the <strong>Start Recognition</strong> button and allow access.</p>
+      <input id="filename" placeholder="Specify a filename..." />
+    </div>
+  </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+    var speech=true;
+    window.SpeechRecognition = window.SpeechRecognition
+      || window.webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+    document.getElementById('start-record-btn').
+      addEventListener('click', e => {
+        speech = true;
+        recognition.interimResults = true;
+        const words = document.querySelector('.words');
+        words.appendChild(p);
+
+
+        recognition.addEventListener('result', e => {
+          const transcript = Array.from(e.results)
+            .map(result => result[0])
+            .map(result => result.transcript)
+            .join('')
+
+          document.getElementById("notetextarea").innerHTML = transcript;
+
+        });
+// ----------------------------------------------
+        if (speech == true) {
+
+          recognition.start();
+          recognition.addEventListener('end', recognition.start);
+        }
+      });
+    document.getElementById('pause-record-btn').
+      addEventListener('click', e => {
+        // recognition.onspeechend = function() {
+        recognition.stop();
+        // }
+        recognition.addEventListener('end', recognition.stop);
+        speech = false;
+        console.log('paused')
+      });
+
+
+    function downloadFile(filename, content) {
+      const element = document.createElement('a');
+      const blob = new Blob([content], { type: 'plain/text' });
+      const fileUrl = URL.createObjectURL(blob);
+      element.setAttribute('href', fileUrl); //file location
+      element.setAttribute('download', filename); // file name
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    };
+    window.onload = () => {
+      document.getElementById('save-note-btn').
+        addEventListener('click', e => {
+          const filename = document.getElementById('filename').value;
+          const content = document.getElementById('notetextarea').value;
+          if (filename && content) {
+            downloadFile(filename, content);
+          }
+          noteTextarea.val('');
+        });
+    };
+  </script>
+</body>
+
+</html>

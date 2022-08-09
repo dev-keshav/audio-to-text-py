@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Speech to Text</title>
+</head>
+
+<body style="background:aliceblue;display: flex;justify-content: center;">
+    <div class="words" contenteditable>
+        <p id="p"></p>
+    </div>
+    <div class="container">
+        <h1 >Speech to Text Notes Making</h1>
+        <div class="app">
+            <div class="input-single">
+                <textarea id="notetextarea" placeholder="Create a new note by typing or using voice recognition."
+                    rows="25" cols="100"></textarea>
+            </div>
+            <div style="display:flex;justify-content: center">
+                <button style="background-color:greenyellow;padding: 2vh 2vw;" id="start-record-btn"
+                    title="Start Recording">Start Recognition</button>
+                <button style="background-color: rgb(247, 115, 115);padding: 2vh 2vw;" id="pause-record-btn"
+                    title="Pause Recording">Pause
+                    Recognition</button>
+            </div>
+
+            <div>
+                <p id="recording-instructions">Press the <strong>Start Recognition</strong> button and allow access.</p>
+                <input id="filename" placeholder="Specify a filename..." />
+                <select name="filetype" id="filetype">
+                    <option value="Word">Word</option>
+                </select>
+                <button id="save-note-btn" title="Save Note">Save Note</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+    <script>
+
+        try {
+            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            var recognition = new SpeechRecognition();
+        }
+        catch (e) {
+            console.error(e);
+            $('.no-browser-support').show();
+            $('.app').hide();
+        }
+
+
+        var noteTextarea = $('#notetextarea');
+        var instructions = $('#recording-instructions');
+        var notesList = $('ul#notes');
+
+        var noteContent = '';
+
+        recognition.continuous = true;
+
+        recognition.onresult = async function (event) {
+            var current =  event.resultIndex;
+            console.log(current)
+            var transcript = await  event.results[current][0].transcript;
+            console.log(transcript)
+            var mobileRepeatBug = (current == 1 && transcript == event.results[0][0].transcript);
+
+            if (!mobileRepeatBug) {
+                noteContent = await (noteContent+ transcript);
+                await noteTextarea.val(noteContent);
+            }
+        };
+
+        recognition.onstart = function () {
+            instructions.text('Voice recognition activated. Try speaking into the microphone.');
+        }
+
+        recognition.onspeechend = function () {
+            instructions.text('You were quiet for a while so voice recognition turned itself off.');
+        }
+
+        recognition.onerror = function (event) {
+            if (event.error == 'no-speech') {
+                instructions.text('No speech was detected. Try again.');
+            };
+        }
+
+
+        $('#start-record-btn').on('click', function (e) {
+            if (noteContent.length) {
+                noteContent += ' ';
+            }
+            recognition.start();
+        });
+
+
+        $('#pause-record-btn').on('click', function (e) {
+            recognition.stop();
+            instructions.text('Voice recognition paused.');
+        });
+
+        // Sync the text inside the text area with the noteContent variable.
+        noteTextarea.on('input', function () {
+            noteContent = $(this).val();
+        })
+
+        // -------------------downloadFile----------------------
+        function downloadFile(filename, content) {
+            const element = document.createElement('a');
+            const blob = new Blob([content], { type: 'plain/text' });
+            const fileUrl = URL.createObjectURL(blob);
+            element.setAttribute('href', fileUrl); //file location
+            element.setAttribute('download', filename); // file name
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            document.getElementById("notetextarea").innerHTML = ''
+            document.getElementById('filename').innerHTML = ''
+        };
+        window.onload = () => {
+            document.getElementById('save-note-btn').
+                addEventListener('click', e => {
+                    var select = document.getElementById('filetype');
+                    var value = select.options[select.selectedIndex].value;
+                    console.log(value);
+
+                    const filename = document.getElementById('filename').value;
+                    const content = document.getElementById('notetextarea').value;
+
+                    if (filename && content && value === 'Word') {
+                        downloadFile(filename + '.txt', content);
+                        noteContent = '';
+                        noteTextarea.val('');
+                        instructions.text('Note saved successfully.');
+
+                    }
+                });
+        };
+    </script>
+</body>
+
+</html>
