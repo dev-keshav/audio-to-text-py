@@ -1,0 +1,137 @@
+body{
+  font-family: Helvetica, sans-serif;
+}
+
+body.live-caption-popup{
+  width: 300px;
+  height: 420px;
+  margin: 0;
+}
+
+img{
+  display: block;
+  margin: 20px auto;
+  width: 30%;
+}
+
+h2.live-caption-title{
+  color: rgb(52, 51, 53);
+  text-align: center;
+  font-weight: 400;
+  margin: 0;
+}
+
+.content-container, header{
+  display: block;
+  margin: 0px auto;
+  width: 75%;
+  text-align: center;
+}
+
+header{
+  margin-bottom: 2em;
+}
+
+header p{
+  color: rgb(115, 116, 118);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.buttons-container{
+  display: flex;
+  width: 100%;
+  margin: 0px auto;
+  align-items: stretch;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0;
+}
+
+button{
+  display: inline-block;
+  padding: 20px;
+  border: none;
+  box-shadow: none;
+  background: rgb(244, 244, 245);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  width: 50%;
+  text-align: center;
+}
+
+.activation-button{
+  font-weight: 600;
+  color:#035a03;
+  border-right: 1px solid white;
+}
+
+.deactivation-button{
+  font-weight: 600;
+  color: #920101;
+}
+
+p.error-message:empty{
+  display: none;
+}
+
+p.error-message{
+  color:#fb2d2d;
+  font-style: italic;
+  font-size: 11px;
+  margin-top: 1em;
+}
+
+label{
+  color: rgb(52, 51, 53);
+  display: block;
+  margin-bottom: 1em;
+  font-size: 12px;
+}
+
+.language-select-element{
+  position: relative;
+  margin-bottom: 1em;
+}
+
+select{
+  border: 1px solid lightgrey;
+  font-size: 12px;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 1em;
+  border: 1px solid #ccc;
+}
+
+.language-select-element:after{
+  content: '<>';
+  font: 17px "Consolas", monospace;
+  color: #333;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+  right: 11px;
+  top: 2.1em;
+  border-bottom: 1px solid #999;
+  position: absolute;
+  pointer-events: none;
+}
+
+.live-caption{
+  bottom: '10px';
+  left: 0;
+  text-align: 'center';
+  background-color: 'rgba(0,0,0,0.8)';
+  position: 'absolute';
+  color: 'white';
+  padding: '10px';
+  font-size: '30px';
+  width: '50%';
+  transform: 'translate(50%)';
+  border: '2px solid white';
+  border-radius: "5px";
+  z-index: "10000";
+  font-family: "Arial";
+}

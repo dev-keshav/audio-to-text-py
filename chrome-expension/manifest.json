@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Speak",
+  "description": "Speak lets you use speech-to-text to provide live captions for presentations",
+  "version": "4",
+  "author": "Keshav Kumar",
+  "short_name": "Speak",
+  "browser_action": {
+    "default_icon": "extension-logo.png",
+    "default_title": "Speak",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "extension-logo.png",
+    "48": "extension-logo.png",
+    "128": "extension-logo.png"
+  },
+  "minimum_chrome_version": "25",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [{
+    "js": ["content.js"],
+    "matches": ["<all_urls>"],
+    "all_frames": true
+  }]
+}
