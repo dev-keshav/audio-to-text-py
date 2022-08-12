@@ -67,11 +67,11 @@ print(file_loc)
 # AWS uploding file
 client = boto3.client(
     's3',
-    aws_access_key_id='AKIA6LMBN6TNRNNGBNI5',
+    aws_access_key_id='AKIA6LMBN6TNRNNGBNI5',  
     aws_secret_access_key='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',
     
 )
 
 
 s3=boto3.resource('s3')
-s3.meta.client.upload_file('D:\projects\audiototext-using-py\test.txt','newup1319',fileun)
+s3.meta.client.upload_file('file_loc','newup1319',fileun)
