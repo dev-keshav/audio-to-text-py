@@ -1,26 +1,88 @@
-var config = {
-  "button": {},
-  "current": {"style": ''},
-  "resize": {"timeout": null},
-  "addon": {
-    "homepage": function () {
-      return chrome.runtime.getManifest().homepage_url;
+var background = {
+  "port": null,
+  "message": {},
+  "receive": function (id, callback) {
+    if (id) {
+      background.message[id] = callback;
     }
   },
-  "message": {
-    "end": "Speech recognition is ended.",
-    "no_speech": "No speech was detected!",
-    "no_microphone": "No microphone was found!",
-    "speak": "Please speak into your microphone...",
-    "denied": "Permission to use the microphone was denied!",
-    "blocked": "Permission to use the microphone is blocked!",
-    "copy": "Press (Ctrl + C) to copy text (Command + C on Mac)",
-    "start": "Speech to Text (Voice Recognition) app is ready.",
-    "no_support": "Speech recognition API is NOT supported in your browser!",
-    "allow": "Please click the - Allow - button to enable microphone in your browser."
+  "connect": function (port) {
+    chrome.runtime.onMessage.addListener(background.listener); 
+    /*  */
+    if (port) {
+      background.port = port;
+      background.port.onMessage.addListener(background.listener);
+      background.port.onDisconnect.addListener(function () {
+        background.port = null;
+      });
+    }
+  },
+  "send": function (id, data) {
+    if (id) {
+      if (background.port) {
+        if (background.port.name !== "webapp") {
+          chrome.runtime.sendMessage({
+            "method": id,
+            "data": data,
+            "path": "interface-to-background"
+          }); 
+        }
+      }
+    }
+  },
+  "post": function (id, data) {
+    if (id) {
+      if (background.port) {
+        background.port.postMessage({
+          "method": id,
+          "data": data,
+          "port": background.port.name,
+          "path": "interface-to-background"
+        });
+      }
+    }
+  },
+  "listener": function (e) {
+    if (e) {
+      for (var id in background.message) {
+        if (background.message[id]) {
+          if ((typeof background.message[id]) === "function") {
+            if (e.path === "background-to-interface") {
+              if (e.method === id) {
+                background.message[id](e.data);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+var config = {
+  "button": {
+    "talk": {},
+    "final": {},
+    "start": {},
+    "dialect": {},
+    "interim": {},
+    "language": {}
+  },
+  "current": {
+    "style": ''
   },
   "linebreak": function (e) {
     return e.replace(/\n\n/g, "<p></p>").replace(/\n/g, "<br>");
+  },
+  // "addon": {
+  //   "homepage": function () {
+  //     return chrome.runtime.getManifest().homepage_url;
+  //   }
+  // },
+  "app": {
+    "start": function () {
+      config.speech.synthesis.init();
+    }
   },
   "capitalize": function (e) {
     return e.replace(/\S/, function (m) {
@@ -30,7 +92,7 @@ var config = {
   "show": {
     "info": function (i, q) {
       var comment = q ? '\n' + ">> " + q : '';
-      config.button.info.textContent = ">> " + config.message[i] + comment;
+      // config.button.info.textContent = ">> " + config.message[i] + comment;
     }
   },
   "nosupport": function (e) {
@@ -54,6 +116,7 @@ var config = {
       if (target) {
         config.button.dialect.textContent = '';
         config.button.dialect.style.visibility = target[1].length === 1 ? "hidden" : "visible";
+        /*  */
         for (var i = 1; i < target.length; i++) {
           config.button.dialect.options.add(new Option(target[i][1], target[i][0]));
         }
@@ -82,6 +145,18 @@ var config = {
       config.button.dialect.selectedIndex = config.speech.synthesis.prefs.dialect;
     }
   },
+  "message": {
+    "end": "Speech recognition is ended.",
+    "no_speech": "No speech was detected!",
+    "no_microphone": "No microphone was found!",
+    "speak": "Please speak into your microphone...",
+    "denied": "Permission to use the microphone was denied!",
+    "blocked": "Permission to use the microphone is blocked!",
+    "copy": "Press (Ctrl + C) to copy text (Command + C on Mac)",
+    "start": "Speech to Text (Voice Recognition) app is ready.",
+    "no_support": "Speech recognition API is NOT supported in your browser!",
+    "allow": "Please click the - Allow - button to enable microphone in your browser."
+  },
   "start": function (e) {
     if (config.speech.synthesis.recognizing) {
       config.recognition.stop();
@@ -98,6 +173,24 @@ var config = {
     config.button.final.textContent = '';
     /*  */
     config.recognition.start();
+  },
+  "resize": {
+    "timeout": null,
+    "method": function () {
+      if (config.port.name === "win") {
+        if (config.resize.timeout) window.clearTimeout(config.resize.timeout);
+        config.resize.timeout = window.setTimeout(async function () {
+          var current = await chrome.windows.getCurrent();
+          /*  */
+          config.storage.write("interface.size", {
+            "top": current.top,
+            "left": current.left,
+            "width": current.width,
+            "height": current.height
+          });
+        }, 1000);
+      }
+    }
   },
   "flash": {
     "timeout": '',
@@ -137,10 +230,10 @@ var config = {
           var tmp = {};
           tmp[id] = data;
           config.storage.local[id] = data;
-          chrome.storage.local.set(tmp, function () {});
+          chrome.storage.local.set(tmp);
         } else {
           delete config.storage.local[id];
-          chrome.storage.local.remove(id, function () {});
+          chrome.storage.local.remove(id);
         }
       }
     }
@@ -163,7 +256,7 @@ var config = {
               document.body.style.height = "550px";
             }
             /*  */
-            chrome.runtime.connect({"name": config.port.name});
+            background.connect(chrome.runtime.connect({"name": config.port.name}));
           }
         }
       }
@@ -185,29 +278,38 @@ var config = {
     config.button.language = document.getElementById("language");
     /*  */
     config.button.start.addEventListener("click", config.start, false);
-    config.button.dialect.addEventListener("change", config.store.dialect, false);
+    config.button.dialect.addEventListener("change", config.store.dialect, true);
     config.button.language.addEventListener("change", config.store.language, false);
-    reload.addEventListener("click", function () {document.location.reload()}, false);
     /*  */
-    support.addEventListener("click", function (e) {
+    reload.addEventListener("click", function () {
+      document.location.reload();
+    });
+    /*  */
+    support.addEventListener("click", function () {
       var url = config.addon.homepage();
       chrome.tabs.create({"url": url, "active": true});
     }, false);
     /*  */
-    donation.addEventListener("click", function (e) {
+    donation.addEventListener("click", function () {
       var url = config.addon.homepage() + "?reason=support";
       chrome.tabs.create({"url": url, "active": true});
     }, false);
     /*  */
-    config.storage.load(config.speech.synthesis.init);
+    config.storage.load(config.app.start);
     window.removeEventListener("load", config.load, false);
   },
   "speech": {
     "synthesis": {
       "recognizing": false,
-      "ignore": {"onend": null},
-      "final": {"transcript": ''},
-      "start": {"timestamp": null},
+      "ignore": {
+        "onend": null
+      },
+      "final": {
+        "transcript": ''
+      },
+      "start": {
+        "timestamp": null
+      },
       "init": function () {
         config.fill.select();
         config.show.info("start", "Please click on the microphone button to start speaking.");
@@ -224,30 +326,11 @@ var config = {
           config.flash.start();
           config.speech.synthesis.recognizing = true;
           config.button.talk.src = "images/micactive.png";
+          /*  */
           var dialect = config.button.dialect[config.button.dialect.selectedIndex].textContent;
           var language = config.button.language[config.button.language.selectedIndex].textContent;
+          /*  */
           config.show.info("speak", "Input language: " + language + ' > ' + dialect);
-        },
-        "onerror": function (e) {
-          if (e.error === "no-speech") {
-            config.flash.stop();
-            config.button.talk.src = "images/mic.png";
-            config.speech.synthesis.ignore.onend = true;
-            config.show.info("no_speech", "Please click on the microphone button again.");
-          }
-          /*  */
-          if (e.error === "audio-capture") {
-            config.flash.stop();
-            config.show.info("no_microphone");
-            config.button.talk.src = "images/mic.png";
-            config.speech.synthesis.ignore.onend = true;
-          }
-          /*  */
-          if (e.error === "not-allowed") {
-            var diff = e.timeStamp - config.speech.synthesis.start.timestamp;
-            config.show.info(diff < 100 ? "blocked" : "denied");
-            config.speech.synthesis.ignore.onend = true;
-          }
         },
         "onend": function () {
           config.speech.synthesis.recognizing = false;
@@ -274,24 +357,50 @@ var config = {
           /*  */
           var interim = '';
           for (var i = e.resultIndex; i < e.results.length; ++i) {
-            if (e.results[i].isFinal) config.speech.synthesis.final.transcript += e.results[i][0].transcript;
-            else interim += e.results[i][0].transcript;
+            if (e.results[i].isFinal) {
+              config.speech.synthesis.final.transcript += e.results[i][0].transcript;
+            } else {
+              interim += e.results[i][0].transcript;
+            }
           }
           /*  */
           config.speech.synthesis.final.transcript = config.capitalize(config.speech.synthesis.final.transcript);
           config.button.final.textContent = config.linebreak(config.speech.synthesis.final.transcript);
           config.button.interim.textContent = config.linebreak(interim);
         },
+        "onerror": function (e) {
+          if (e.error === "no-speech") {
+            config.flash.stop();
+            config.button.talk.src = "images/mic.png";
+            config.speech.synthesis.ignore.onend = true;
+            config.show.info("no_speech", "Please click on the microphone button again.");
+          }
+          /*  */
+          if (e.error === "audio-capture") {
+            config.flash.stop();
+            config.show.info("no_microphone");
+            config.button.talk.src = "images/mic.png";
+            config.speech.synthesis.ignore.onend = true;
+          }
+          /*  */
+          if (e.error === "not-allowed") {
+            var diff = e.timeStamp - config.speech.synthesis.start.timestamp;
+            config.show.info(diff < 100 ? "blocked" : "denied");
+            config.speech.synthesis.ignore.onend = true;
+          }
+        },
         "oninit": function () {
           window.SpeechRecognition = window.webkitSpeechRecognition || window.mozSpeechRecognition || window.SpeechRecognition;
           /*  */
-          if (window.SpeechRecognition === undefined) config.nosupport();
-          else {
+          if (window.SpeechRecognition === undefined) {
+            config.nosupport();
+          } else {
             if (navigator.getUserMedia) {
               config.show.info("allow");
               navigator.getUserMedia({"audio": true}, function (stream) {
                 if (stream.active) {
                   config.recognition = new window.SpeechRecognition();
+                  /*  */
                   config.recognition.continuous = true;
                   config.recognition.interimResults = true;
                   config.recognition.onend = config.speech.synthesis.methods.onend;
@@ -303,11 +412,16 @@ var config = {
                   config.show.info("blocked", "Please reload the app and try again.");
                   config.speech.synthesis.ignore.onend = true;
                 }
-              }, function () {
+              }, function (e) {
+                
+                console.error(e);
+                
                 config.show.info("blocked", "Please reload the app and try again.");
                 config.speech.synthesis.ignore.onend = true;
               });
-            } else config.nosupport();
+            } else {
+              config.nosupport();
+            }
           }
         }
       }
@@ -315,13 +429,7 @@ var config = {
   }
 };
 
-window.addEventListener("resize", function () {
-  if (config.resize.timeout) window.clearTimeout(config.resize.timeout);
-  config.resize.timeout = window.setTimeout(function () {
-    config.storage.write("width", window.innerWidth || window.outerWidth);
-    config.storage.write("height", window.innerHeight || window.outerHeight);
-  }, 1000);
-}, false);
-
 config.port.connect();
+
 window.addEventListener("load", config.load, false);
+window.addEventListener("resize", config.resize.method, false);

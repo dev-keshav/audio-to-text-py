@@ -9,31 +9,32 @@ var core = {
     var context = config.interface.context;
     var url = app.interface.path + '?' + context;
     /*  */
+    app.interface.id = '';
     app.button.popup(context === "popup" ? url : '');
     /*  */
     app.contextmenu.create({
       "id": "tab", 
       "type": "radio", 
+      "contexts": ["action"],
       "title": "Open in tab",  
-      "checked": context === "tab",
-      "contexts": ["browser_action"],
-    });
+      "checked": context === "tab"
+    }, app.error);
     /*  */
     app.contextmenu.create({
       "id": "win", 
       "type": "radio", 
+      "contexts": ["action"],
       "title": "Open in win",  
-      "checked": context === "win",
-      "contexts": ["browser_action"],
-    });
+      "checked": context === "win"
+    }, app.error);
     /*  */
     app.contextmenu.create({
       "id": "popup", 
       "type": "radio", 
+      "contexts": ["action"],
       "title": "Open in popup",  
-      "checked": context === "popup",
-      "contexts": ["browser_action"],
-    });
+      "checked": context === "popup"
+    }, app.error);
   }
 };
 
@@ -63,6 +64,9 @@ app.button.on.clicked(function () {
         app.tab.get(app.interface.id, function (tab) {
           if (tab) {
             app.tab.update(app.interface.id, {"active": true});
+          } else {
+            app.interface.id = '';
+            app.tab.open(url);
           }
         });
       }
@@ -71,6 +75,9 @@ app.button.on.clicked(function () {
         app.window.get(app.interface.id, function (win) {
           if (win) {
             app.window.update(app.interface.id, {"focused": true});
+          } else {
+            app.interface.id = '';
+            app.interface.create();
           }
         });
       }
@@ -82,5 +89,4 @@ app.button.on.clicked(function () {
 });
 
 app.on.startup(core.start);
-app.on.connect(app.connect);
 app.on.installed(core.install);
