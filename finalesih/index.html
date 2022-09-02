@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="index.css">
+  <title>Speech To Text</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js"></script>
+</head>
+
+<body class="container pt-5 bg-dark">
+  <h1 class="mt-4 text-light">RUN TIME VIRTUAL NOTES MAKER</h1>
+  <div style="display: flex;justify-content:space-between;align-items: center;">
+    <div class="mt-4" id="div_language">
+      <div class="buttons">
+        <button class="btn btn-success" id="start">Start</button>
+        <button class="btn btn-danger" id="stop">Stop</button>
+      </div>
+      <h3 class="mb-3 text-light">SELECT ENGLISH ACCENT</h3>
+      <div class="select">
+        <select class="form-select bg-secondary text-light" id="select_language" onchange="updateCountry()"></select>
+        <select class="form-select bg-secondary text-light mt-2" id="select_dialect"></select>
+      </div>
+
+
+
+      <p id="status" class="lead mt-3 text-light" style="display: none">Listenting ...</p>
+      <div class="filehandle">
+        <h3>SAVE FILE AS...</h2>
+          <input id="filename" placeholder="ENTER .txt FILENAME" />
+
+          <button onclick="generatePDF()" id="htmltopdf" title="Save Note in pdf">As pdf</button>
+          <button id="save-note-btn" title="Save Note">SAVE FILE</button>
+
+      </div>
+    </div>
+
+
+
+    <textarea rows="17" cols="100" id="final" class="area"></textarea>
+    <br>
+
+  </div>
+  </div>
+  <span id="interim" style="color:white"></span>
+</body>
+<script src="./speechRecognization.js"></script>
+<script src="./language.js"></script>
+
+
+</html>

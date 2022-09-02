@@ -1,0 +1,209 @@
+.area{
+  
+   /* box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80); */
+   color:#000;
+    background:#fff ;
+   /* opacity: 0.8; */
+   height: 80vh;
+   width: 100%;
+   font-weight: bold;
+   font-size: large;
+   font-family: 'Times New Roman', Times, serif;
+   font-display: block;
+   letter-spacing: 0.8px;
+
+   
+   
+}
+.container{
+    /* background: linear-gradient(100deg,#b2aeb3,#908d93); */
+    background: #313030;
+    background-repeat: no-repeat;
+    height: 100vh;
+    padding: 10px;
+}
+.mt-4{
+    text-align: center;
+    /* color: rgb(7, 7, 7); */
+    color: #fff;
+    padding: 10px; 
+    display: grid;
+    /* text-shadow: 3px 8px 8px rgba(54, 54, 53, 0.636),3px 3px 5px rgba(5, 0, 13, 0.727); */
+}
+.box_1{
+    display: flex;
+    text-align: center; 
+    padding-right: 10px;  
+}
+
+#start:hover{
+    
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 8vw;
+    background-color: rgb(19, 224, 101);
+    padding: 7px;
+    border-radius:5px;
+    transition: 0.6s;
+    height: 5vh;
+    font-size: 90%;
+    color: #000;
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+}
+#stop:hover{
+   
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 8vw;
+    height: 5vh;
+    transition: 0.6s;
+    background-color:rgb(224, 19, 19);
+    font-size: 90%;
+    border-radius:5px;
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    color: #000;
+}
+#start{
+    color: rgb(19, 224, 101);
+    background-color: rgb(9, 9, 9);
+    height: 6vh;
+    width: 7vw;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    /* box-shadow: 0 10 10px rgb(19, 224, 101), 10 10 80px rgb(19, 224, 101), 0 0 80px rgb(19, 224, 101); */
+    font-weight: bolder;
+}
+#stop{
+    color: rgb(224, 19, 19);
+    background-color: rgb(6, 6, 6);
+    /* box-shadow: 0 10 10px  rgb(224, 19, 19), 10 10 80px  rgb(224, 19, 19), 0 0 80px  rgb(224, 19, 19); */
+    height: 6vh;
+    width: 7vw;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bolder;
+}
+.buttons{
+   margin-top: 10px;
+   
+}
+
+#select_language
+{
+    visibility: hidden;
+    text-align:center;
+    padding: 2px;
+    font-family: 'Times New Roman', Times, serif;
+    height: 4vh;
+    text-transform: uppercase;
+    font-weight: bolder;
+
+}
+#select_language:hover{
+    visibility: hidden;
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    background: #ccc9c9;
+    font-family: 'Times New Roman', Times, serif;
+    border-radius: 10px;
+    opacity: 0.98;
+    transition: 0.6s;
+    font-weight: 900;
+    color: #000;
+}
+#select_dialect
+{
+  
+    padding: 2px;
+    text-align:center;
+    font-family: 'Times New Roman', Times, serif;
+    height: 4vh;
+    letter-spacing: 1px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-weight: bolder;
+    
+}
+#select_dialect:hover
+{
+  
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    background: #ccc9c9;
+    font-family: 'Times New Roman', Times, serif;
+    border-radius: 10px;
+    opacity: 0.98;
+    transition: 0.6s;
+    font-weight: 900;
+    color: #000;
+}
+
+#filetype{
+    padding: 2px;
+    text-align:center;
+    font-family: 'Times New Roman', Times, serif;
+    text-transform: uppercase;
+    font-weight: bolder;
+    height: 4vh;
+}
+#filetype:hover{
+   
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    background: #ccc9c9;
+    font-family: 'Times New Roman', Times, serif;
+    border-radius: 10px;
+    opacity: 0.98;
+    font-weight: 900;
+    transition: 0.6s;
+    color: #000;
+}
+#filename
+{
+    height: 3vh;
+    text-align: center;
+    color: #000; 
+    text-transform: uppercase;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    
+}
+#filename:hover
+{
+    
+    height: 3vh;
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    background: #ccc9c9;
+    font-family: 'Times New Roman', Times, serif;
+    border-radius: 10px;
+    transition: 0.6s;
+    opacity: 0.98;
+    
+    font-weight: 900;
+    color: #000;
+
+}
+
+#save-note-btn
+{
+    padding: 2px;
+    text-align:center;
+    font-family: 'Times New Roman', Times, serif;
+    letter-spacing: 1px;
+    margin-top: 18px;
+    border-radius: 10px;
+    font-weight: bolder;
+    height: 4vh;
+
+    
+}
+#save-note-btn:hover{
+    
+    box-shadow: 0 5px 35px 15px  rgba(30, 8, 6, 0.481),0 10px 16px 0 rgb(4, 37, 80);
+    background: rgb(4, 3, 5);
+    font-family: 'Times New Roman', Times, serif;
+    transition: 0.6s;
+    
+    /* border-radius: 10px; */
+    
+    color: rgb(19, 224, 101);
+}
